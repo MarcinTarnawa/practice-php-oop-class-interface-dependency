@@ -2,7 +2,7 @@
 
 &nbsp;
 
-# PHP & OOP: Class, Interface, Dependency (47-50)
+# PHP & OOP (1-4): Class, Interface, Dependency
 
 Prezentowane zadania są przygotowane na podstawie rozdziałów "[1 - 4](https://laracasts.com/series/object-oriented-principles-in-php-2024-edition/episodes/1)" dla kursu "[Object-Orented Principles in PHP](https://laracasts.com/series/php-for-beginners-2023-edition)". Użyj [linku polecającego](https://laracasts.com/referral/bogolubow), aby się zarejestrować i docenić moją pracę.
 
