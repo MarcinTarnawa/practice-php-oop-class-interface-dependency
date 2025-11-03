@@ -3,6 +3,7 @@
 class Calendar
 {
     protected $currentDay;
+
     public function calendar()
     {
         return $this->currentDay = $this->date("Y-m-j");
@@ -14,207 +15,208 @@ class Calendar
 
         return date($format);
     }
-}
-
-class Teacher
-{
-    protected $teachers = [];
-
-    public function addTeacher(string $name): array
+    public function getDateForDayName(string $dayName): string
     {
-        $newTeacher = [
-            'name' => $name
+        $dayMap = [
+            'Poniedziałek' => 'Monday',
+            'Wtorek'       => 'Tuesday',
+            'Środa'        => 'Wednesday',
+            'Czwartek'     => 'Thursday',
+            'Piątek'       => 'Friday',
+            'Sobota'       => 'Saturday',
+            'Niedziela'    => 'Sunday',
         ];
 
-        $this->teachers[] = $newTeacher; 
-        
-        return $this->teachers;
-    }
+        $englishDayName = $dayMap[$dayName] ?? null;
 
-    public function getTeachers(): array
-    {
-        return $this->teachers;
-    }
-
-    public function getTeacherName(string $name): ?array
-    {
-        foreach ($this->teachers as $teacher) {
-            if (stripos($teacher['name'], $name) !== false) {
-                return $teacher;
-            }
+        if ($englishDayName) {
+            $timestamp = strtotime("next {$englishDayName}");
+            return date("Y-m-j", $timestamp);
         }
-        return null;
+        return $this->date("Y-m-j"); 
+    }
+}
+
+abstract class Human
+{
+    protected $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    abstract public function sayHello();
+}
+
+class Teacher extends Human
+{
+    public function sayHello()
+    {
+        echo "Jestem profesorem $this->name";
     }
 }
 
 class Subject
 {
-    protected $subjects = [];
+    protected $name;
 
-    public function addSubject(string $name): array
+    public function __construct(string $name)
     {
-        $this->subjects[] = $name;
-        return $this->subjects;
-    }
-
-    public function getSubjects(): array
-    {
-        return $this->subjects;
-    }
-
-    public function getSubjectName(string $name)
-    {
-        foreach ($this->subjects as $subject) {
-            if (stripos($subject, $name) !== false) {
-                return $subject;
-            }
-        }
-        return null;
+        $this->name = $name;
     }
 }
 
-class ClassGroup
+class Student extends Human
 {
-    protected $classGroup = [];
-
-    public function addClassGroup(string $name)
+    public function sayHello()
     {
-        $this->classGroup[] = $name;
-        return $this->classGroup;
+        echo "Jestem uczniem $this->name";
+    }
+}
+
+class StudentsClass
+{
+    protected array $students = [];
+    protected string $className;
+
+    public function __construct($className)
+    {
+        $this->className = $className;
     }
 
-    public function getClass(): array
-    {
-        return $this->classGroup;
-    }
-    
-    public function getClassName(string $name)
-    {
-        foreach ($this->classGroup as $className) {
-            if (stripos($className, $name) !== false) {
-                return $className;
-            }
-        }
-        return null;
+    public function addStudent(Student $student)
+    {   
+        $this->students[] = $student;
     }
 }
 
 class Lesson
 {
-    protected $lesson = [];
-    
-    public function addLesson(
-        string $classGroupName, 
-        string $subjectName, 
-        string $teacherName, 
-        string $dateTime,
-        ClassGroup $classGroupManager,
-        Subject $subjectManager,
-        Teacher $teacherManager
-    ): ?array
-    {
-        $foundClass = $classGroupManager->getClassName($classGroupName);
-        $foundSubject = $subjectManager->getSubjectName($subjectName);
-        $foundTeacher = $teacherManager->getTeacherName($teacherName);
-        
-        if (!$foundClass || !$foundSubject || !$foundTeacher) {
-            echo "Error: Can't add new lesson. (Looking for: {$classGroupName}, {$subjectName}, {$teacherName})<br>";
-            return null;
-        }
+    protected StudentsClass $studentClass;
+    protected Teacher $teacher;
+    protected Subject $subject;
+    protected int $room;
+    protected string $time;
 
-        $newLesson = [
-            'class' => $foundClass,
-            'subject' => $foundSubject,
-            'teacher' => $foundTeacher['name'],
-            'date' => $dateTime,
-        ];
-        
-        $this->lesson[] = $newLesson;
-        
-        return $newLesson;
+    public function __construct(Subject $subject)
+    {
+        $this->subject = $subject;
     }
 
-    public function getLessons(): array
+    public function saveTeacher(Teacher $teacher)
     {
-        return $this->lesson;
+        $this->teacher = $teacher;
+    }
+
+    public function saveStudentClass(StudentsClass $studentClass)
+    {
+        $this->studentClass = $studentClass;
+    }
+
+    public function addStudent(Student $student)
+    {
+        $this->studentClass->addStudent($student);
+    }
+
+    public function classRoom(int $room)
+    {
+        $this->room = $room;
+    }
+
+    public function timeLesson(string $time)
+    {
+        $this->time = $time;
     }
 }
 
-class Harmonogram
+class Day
 {
-    protected $lessons = [];
+    protected string $name;
+    protected array $lesson;
+    protected string $calendar;
 
-    public function __construct(Lesson $lesson)
+    public function __construct(string $name)
     {
-        $this->lessons = $lesson->getLessons(); 
+        $this->name = $name;
     }
 
-    public function getHarmonogram(): array
+    public function addLesson(Lesson $lesson)
     {
-        return $this->lessons;
+        $this->lesson[] = $lesson;
+    }
+
+    public function dateTime(Calendar $calendar)
+    {
+        $this->calendar = $calendar->getDateForDayName($this->name);
     }
 }
 
-$calendar = new Calendar;
-$currentDate = $calendar->calendar(); 
-echo $currentDate . "<br>";
+$calendar = new Calendar();
 
-$teacher = new Teacher();
-$teacher->addTeacher('Marcin T');
-$teacher->addTeacher('Anna Kowal');
-$teacher->addTeacher('Anna Stec');
-$teacher->addTeacher('Robert Nowak');
+$teacher1 = new Teacher("Marcin");
+$teacher2 = new Teacher("Anna");
+$teacher3 = new Teacher("Katarzyna");
 
-$courseList = new Subject();
-$courseList->addSubject('Matematyka');
-$courseList->addSubject('Informatyka');
-$courseList->addSubject('Historia');
 
-$classGroup = new ClassGroup();
-$classGroup->addClassGroup('3A');
-$classGroup->addClassGroup('3B');
-$classGroup->addClassGroup('1C');
+$student1 = new Student("Mateusz");
+$student2 = new Student("Kamil");
+$student3 = new Student("Irenka");
+$student4 = new Student("Zbigniew");
 
-$lesson = new Lesson();
 
-$newLesson1 = $lesson->addLesson(
-    '3B',
-    'Matematyka',
-    'Anna Stec',
-    '2025-09-13 08:00',
-    $classGroup,
-    $courseList,
-    $teacher
-);
+$classA = new StudentsClass("A");
+$classA->addStudent($student1);
+$classA->addStudent($student2);
 
-$newLesson2 = $lesson->addLesson(
-    '3A',
-    'Historia',
-    'Robert',
-    '2025-09-13 09:15',
-    $classGroup,
-    $courseList,
-    $teacher
-);
+$classB = new StudentsClass("B");
+$classB->addStudent($student3);
+$classB->addStudent($student4);
 
-$newLesson3 = $lesson->addLesson(
-    '1C', 
-    'Informatyka',
-    'Marcin',
-    '2025-09-13 10:45',
-    $classGroup,
-    $courseList,
-    $teacher
-);
+$subjectPolish = new Subject("Polski");
 
-$harmonogram = new Harmonogram($lesson);
-$harmonogramData = $harmonogram->getHarmonogram();
+$lessonPolish = new Lesson($subjectPolish);
+$lessonPolish->saveTeacher($teacher1);
+$lessonPolish->saveStudentClass($classA);
+$lessonPolish->addStudent(new Student("Janek"));
+$lessonPolish->classRoom(1);
+$lessonPolish->timeLesson("8:00");
+
+$subjectEnglish = new Subject("Angielski");
+$lessonEnglish = new Lesson($subjectEnglish);
+$lessonEnglish->saveTeacher($teacher2);
+$lessonEnglish->saveStudentClass($classB);
+$lessonEnglish->classRoom(4);
+$lessonEnglish->timeLesson("9:00");
+
+$subjectEnglish2 = new Subject("Angielski");
+$lessonEnglish2 = new Lesson($subjectEnglish2);
+$lessonEnglish2->saveTeacher($teacher2);
+$lessonEnglish2->saveStudentClass($classB);
+$lessonEnglish2->classRoom(3);
+$lessonEnglish2->timeLesson("11:00");
+
+$day = new Day("Poniedziałek");
+$day->dateTime($calendar);
+$day->addLesson($lessonPolish);
+$day->addLesson($lessonEnglish);
+
+$day2 = new Day("Wtorek");
+$day2->dateTime($calendar);
+$day2->addLesson($lessonPolish);
+$day2->addLesson($lessonEnglish);
+
+$day3 = new Day("Czwartek");
+$day3->dateTime($calendar);
+$day3->addLesson($lessonPolish);
+$day3->addLesson($lessonEnglish2);
 
 ?>
-
 <pre>
-<?php
-echo "Harmonogram Data (Lessons Table):\n";
-var_dump($harmonogramData);
+<?php 
+
+var_dump($day);
+var_dump($day2);
+var_dump($day3);
 ?>
 </pre>

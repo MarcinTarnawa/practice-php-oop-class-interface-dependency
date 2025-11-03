@@ -3,7 +3,7 @@
 class Counter
 {
 
-    public function __construct(public $amount)
+    public function __construct(private $amount)
     {
         return $amount;
     }

@@ -2,26 +2,32 @@
 
 require '../02/index.php';
 
-class Cart implements ShopProduct
+class createProduct implements Product
+{
+    public $name;
+    public $price;
+    public $tax;
+    public $Ean;
+
+    public function __construct(string $name, float $price, int $tax, int $Ean)
+    {
+        $this->name = $name;
+        $this->price = $price;
+        $this->tax = $tax;
+        $this->Ean = $Ean;
+    }
+}
+
+class Cart implements addProduct
 {
     public $cart = [];
-
-    public function product(string $name, float $price, int $tax, int $EAN)
+    
+    public function addProduct(Product $product)
     {
-        return [
-            'name' => $name,
-            'price' => $price,
-            'tax' => $tax,
-            'EAN' => $EAN
-        ];
-    }
-
-    public function addToCart($product)
-    {
-        $this->cart[] = $product; 
+        $this->cart[] = $product;
         return $this->cart;
     }
-    
+
     public function removeFromCart($id)
     {
        foreach ($this->cart as $key => $product) {
@@ -35,32 +41,41 @@ class Cart implements ShopProduct
     public function search($productName)
     {
         foreach ($this->cart as $key => $product) {
-            if ($product['name'] === $productName) {
+            if (str_contains(strtolower($product->name), strtolower($productName))) {
                 $search[] = $productName;
             }
         }
-        if(isset($search)){
-        foreach($search as $item => $name)
-            echo $name . "</br>";
+
+        if (!empty($search)) {
+            $count = count($search);
+            $productName = reset($search); 
+            echo "Found $count $productName.<br>";
+            
         } else {
             echo "No items found";
         }
     }
 }
 
-$test = new Cart;
+$cart = new Cart();
 
-$produktA = $test->product('stolik', 69.99, 8, 3321132215534); 
-$test->addToCart($produktA);
-$produktB = $test->product('krzeslo', 35.55, 23, 1231231231232); 
-$test->addToCart($produktB);
-$produktC = $test->product('fotel', 49.99, 12, 5901452457853); 
-$test->addToCart($produktC);
+$productStolik = new createProduct('stolik', 69.99, 8, 3321132215534);
+$productKrzeslo = new createProduct('krzeslo', 33.99, 12, 257272744);
+$productKrzeslo2 = new createProduct('krzeslo 2', 18.99, 12, 1312133213);
+$productKrzeslo3 = new createProduct('krzeslo 3', 45.99, 12, 8786453453);
 
-$test->search('stolik');
+$cart->addProduct($productStolik);
+$cart->addProduct($productKrzeslo);
+$cart->addProduct($productKrzeslo2);
+$cart->addProduct($productKrzeslo3);
+
+$cart->search('krzeslo');
+$cart->removeFromCart(1);
+$cart->search('Krzeslo');
+
 ?>
 <pre>
 <?php
-var_dump($test);
+var_dump($cart);
 ?>
 </pre>
