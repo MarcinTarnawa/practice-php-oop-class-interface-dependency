@@ -2,7 +2,7 @@
 
 require '../02/index.php';
 
-class createProduct implements Product
+class Product implements IProduct
 {
     public $name;
     public $price;
@@ -18,7 +18,7 @@ class createProduct implements Product
     }
 }
 
-class Cart implements addProduct
+class Cart implements CartOperations
 {
     public $cart = [];
     
@@ -59,10 +59,10 @@ class Cart implements addProduct
 
 $cart = new Cart();
 
-$productStolik = new createProduct('stolik', 69.99, 8, 3321132215534);
-$productKrzeslo = new createProduct('krzeslo', 33.99, 12, 257272744);
-$productKrzeslo2 = new createProduct('krzeslo 2', 18.99, 12, 1312133213);
-$productKrzeslo3 = new createProduct('krzeslo 3', 45.99, 12, 8786453453);
+$productStolik = new Product('stolik', 69.99, 8, 3321132215534);
+$productKrzeslo = new Product('krzeslo', 33.99, 12, 257272744);
+$productKrzeslo2 = new Product('krzeslo 2', 18.99, 12, 1312133213);
+$productKrzeslo3 = new Product('krzeslo 3', 45.99, 12, 8786453453);
 
 $cart->addProduct($productStolik);
 $cart->addProduct($productKrzeslo);

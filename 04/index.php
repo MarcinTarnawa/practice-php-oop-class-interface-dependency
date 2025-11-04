@@ -97,7 +97,6 @@ class Lesson
     protected Teacher $teacher;
     protected Subject $subject;
     protected int $room;
-    protected string $time;
 
     public function __construct(Subject $subject)
     {
@@ -119,14 +118,9 @@ class Lesson
         $this->studentClass->addStudent($student);
     }
 
-    public function classRoom(int $room)
+    public function setClassRoom(int $room)
     {
         $this->room = $room;
-    }
-
-    public function timeLesson(string $time)
-    {
-        $this->time = $time;
     }
 }
 
@@ -135,9 +129,11 @@ class Day
     protected string $name;
     protected array $lesson;
     protected string $calendar;
+    protected string $time;
 
-    public function __construct(string $name)
+    public function __construct(string $time, string $name)
     {
+        $this->time = $time;
         $this->name = $name;
     }
 
@@ -179,34 +175,31 @@ $lessonPolish = new Lesson($subjectPolish);
 $lessonPolish->saveTeacher($teacher1);
 $lessonPolish->saveStudentClass($classA);
 $lessonPolish->addStudent(new Student("Janek"));
-$lessonPolish->classRoom(1);
-$lessonPolish->timeLesson("8:00");
+$lessonPolish->setClassRoom(1);
 
 $subjectEnglish = new Subject("Angielski");
 $lessonEnglish = new Lesson($subjectEnglish);
 $lessonEnglish->saveTeacher($teacher2);
 $lessonEnglish->saveStudentClass($classB);
-$lessonEnglish->classRoom(4);
-$lessonEnglish->timeLesson("9:00");
+$lessonEnglish->setClassRoom(4);
 
 $subjectEnglish2 = new Subject("Angielski");
 $lessonEnglish2 = new Lesson($subjectEnglish2);
 $lessonEnglish2->saveTeacher($teacher2);
 $lessonEnglish2->saveStudentClass($classB);
-$lessonEnglish2->classRoom(3);
-$lessonEnglish2->timeLesson("11:00");
+$lessonEnglish2->setClassRoom(3);
 
-$day = new Day("Poniedziałek");
+$day = new Day("8:00", "Poniedziałek");
 $day->dateTime($calendar);
 $day->addLesson($lessonPolish);
 $day->addLesson($lessonEnglish);
 
-$day2 = new Day("Wtorek");
+$day2 = new Day("9:00", "Wtorek");
 $day2->dateTime($calendar);
 $day2->addLesson($lessonPolish);
 $day2->addLesson($lessonEnglish);
 
-$day3 = new Day("Czwartek");
+$day3 = new Day("11:00", "Czwartek");
 $day3->dateTime($calendar);
 $day3->addLesson($lessonPolish);
 $day3->addLesson($lessonEnglish2);
